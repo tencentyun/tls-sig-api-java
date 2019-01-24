@@ -33,6 +33,22 @@ public class TlsSigTest {
             checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun2", pubStr);
             Assert.assertNotEquals(null, checkResult);
             Assert.assertFalse( checkResult.verifyResult);
+
+
+            // new interface generate signature
+            result = tls_sigature.genSig(1400000955, "xiaojun", privStr);
+            Assert.assertNotEquals(null, result);
+            Assert.assertNotEquals(null, result.urlSig);
+            Assert.assertNotEquals(0, result.urlSig.length());
+
+            // check signature
+            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun", pubStr);
+            Assert.assertNotEquals(null, checkResult);
+            Assert.assertTrue(checkResult.verifyResult);
+
+            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun2", pubStr);
+            Assert.assertNotEquals(null, checkResult);
+            Assert.assertFalse( checkResult.verifyResult);
         } catch (Exception e) {
             e.printStackTrace();
         }

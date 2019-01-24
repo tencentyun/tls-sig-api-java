@@ -65,9 +65,8 @@ public class tls_sigature {
 	public static GenTLSSignatureResult GenTLSSignature(long expire, 
 			String strAppid3rd, long skdAppid, 
 			String identifier, long accountType, 
-			String privStr )
+			String privStr)
 	{
-
 		GenTLSSignatureResult result = new GenTLSSignatureResult();
 		
         Security.addProvider(new BouncyCastleProvider());
@@ -351,4 +350,19 @@ public class tls_sigature {
 		return result;
 	}
 
+	public static GenTLSSignatureResult genSig(
+			long sdkappid,
+			String identifier,
+			String priKey) {
+		// 默认 180 天
+		return GenTLSSignature(24*3600*180, "0", sdkappid, identifier, 0, priKey);
+	}
+
+	public static GenTLSSignatureResult genSig(
+			long sdkappid,
+			String identifier,
+			int expire,
+			String priKey) {
+		return GenTLSSignature(expire, "0", sdkappid, identifier, 0, priKey);
+	}
 }
