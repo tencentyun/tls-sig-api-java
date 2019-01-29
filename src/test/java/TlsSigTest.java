@@ -8,45 +8,45 @@ public class TlsSigTest {
         try {
             //Use pemfile keys to test
             String privStr = "-----BEGIN PRIVATE KEY-----\n" +
-                    "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgiBPYMVTjspLfqoq46oZd\n" +
-                    "j9A0C8p7aK3Fi6/4zLugCkehRANCAATU49QhsAEVfIVJUmB6SpUC6BPaku1g/dzn\n" +
-                    "0Nl7iIY7W7g2FoANWnoF51eEUb6lcZ3gzfgg8VFGTpJriwHQWf5T\n" +
-                    "-----END PRIVATE KEY-----";
+                "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgkTfHxPa8YusG+va8\n" +
+                "1CRztNQBOEr90TBEjlQBZ5d1Y0ChRANCAAS9isP/xLib7EZ1vS5OUy+gOsYBwees\n" +
+                "PMDvWiTygPAUsGZv1PHLoa0ciqsElkO1fMGwNrzOKJx1Oo194Ri+SypV\n" +
+                "-----END PRIVATE KEY-----";
 
             //change public pem string to public string
             String pubStr = "-----BEGIN PUBLIC KEY-----\n" +
-                    "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE1OPUIbABFXyFSVJgekqVAugT2pLtYP3c\n" +
-                    "59DZe4iGO1u4NhaADVp6BedXhFG+pXGd4M34IPFRRk6Sa4sB0Fn+Uw==\n" +
-                    "-----END PUBLIC KEY-----";
+                "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvYrD/8S4m+xGdb0uTlMvoDrGAcHn\n" +
+                "rDzA71ok8oDwFLBmb9Txy6GtHIqrBJZDtXzBsDa8ziicdTqNfeEYvksqVQ==\n" +
+                "-----END PUBLIC KEY-----";
 
             // generate signature
-            tls_sigature.GenTLSSignatureResult result = tls_sigature.GenTLSSignatureEx(1400000955, "xiaojun", privStr);
+            tls_sigature.GenTLSSignatureResult result = tls_sigature.GenTLSSignatureEx(1400000000, "xiaojun", privStr);
             Assert.assertNotEquals(null, result);
             Assert.assertNotEquals(null, result.urlSig);
             Assert.assertNotEquals(0, result.urlSig.length());
 
             // check signature
-            tls_sigature.CheckTLSSignatureResult checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun", pubStr);
+            tls_sigature.CheckTLSSignatureResult checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000000, "xiaojun", pubStr);
             Assert.assertNotEquals(null, checkResult);
             Assert.assertTrue(checkResult.verifyResult);
 
-            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun2", pubStr);
+            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000000, "xiaojun2", pubStr);
             Assert.assertNotEquals(null, checkResult);
             Assert.assertFalse( checkResult.verifyResult);
 
 
             // new interface generate signature
-            result = tls_sigature.genSig(1400000955, "xiaojun", privStr);
+            result = tls_sigature.genSig(1400000000, "xiaojun", privStr);
             Assert.assertNotEquals(null, result);
             Assert.assertNotEquals(null, result.urlSig);
             Assert.assertNotEquals(0, result.urlSig.length());
 
             // check signature
-            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun", pubStr);
+            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000000, "xiaojun", pubStr);
             Assert.assertNotEquals(null, checkResult);
             Assert.assertTrue(checkResult.verifyResult);
 
-            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000955, "xiaojun2", pubStr);
+            checkResult = tls_sigature.CheckTLSSignatureEx(result.urlSig, 1400000000, "xiaojun2", pubStr);
             Assert.assertNotEquals(null, checkResult);
             Assert.assertFalse( checkResult.verifyResult);
         } catch (Exception e) {
