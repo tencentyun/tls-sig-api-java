@@ -15,7 +15,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 sourceCompatibility = 1.6
-version = '1.0'
+version = '1.2'
 group = "com.github.tencentyun"
 archivesBaseName = "tls-sig-api"
 tasks.withType(JavaCompile) {
@@ -78,9 +78,9 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id 'okhowang'
-                        name 'okhowang'
-                        email 'okhowang@tencent.com'
+                        id 'weijunyi'
+                        name 'weijunyi'
+                        email 'weijunyi@tencent.com'
                     }
                 }
             }
