@@ -63,8 +63,8 @@ public class tls_sigature {
      */
     @Deprecated
     public static GenTLSSignatureResult GenTLSSignature(long expire,
-            String appid3rd, long sdkappid, String identifier,
-            long accountType, String priKeyContent) {
+                                                        String appid3rd, long sdkappid, String identifier,
+                                                        long accountType, String priKeyContent) {
 
         GenTLSSignatureResult result = new GenTLSSignatureResult();
 
@@ -84,23 +84,19 @@ public class tls_sigature {
 
         //Create Json string and serialization String
         String jsonString = "{"
-        + "\"TLS.account_type\":\"" + accountType +"\","
-        +"\"TLS.identifier\":\"" + identifier +"\","
-        +"\"TLS.appid_at_3rd\":\"" + appid3rd +"\","
-        +"\"TLS.sdk_appid\":\"" + sdkappid +"\","
-        +"\"TLS.expire_after\":\"" + expire +"\""
-        +"}";
-        //System.out.println("#jsonString : \n" + jsonString);
-
+                + "\"TLS.account_type\":\"" + accountType +"\","
+                + "\"TLS.identifier\":\"" + identifier +"\","
+                + "\"TLS.appid_at_3rd\":\"" + appid3rd +"\","
+                + "\"TLS.sdk_appid\":\"" + sdkappid +"\","
+                + "\"TLS.expire_after\":\"" + expire +"\""
+                + "}";
         String time = String.valueOf(System.currentTimeMillis()/1000);
-        String SerialString =
-            "TLS.appid_at_3rd:" + appid3rd + "\n" +
-            "TLS.account_type:" + accountType + "\n" +
-            "TLS.identifier:" + identifier + "\n" +
-            "TLS.sdk_appid:" + sdkappid + "\n" +
-            "TLS.time:" + time + "\n" +
-            "TLS.expire_after:" + expire +"\n";
-
+        String SerialString = "TLS.appid_at_3rd:" + appid3rd + "\n"
+                + "TLS.account_type:" + accountType + "\n"
+                + "TLS.identifier:" + identifier + "\n"
+                + "TLS.sdk_appid:" + sdkappid + "\n"
+                + "TLS.time:" + time + "\n"
+                + "TLS.expire_after:" + expire +"\n";
         try{
             //Create Signature by SerialString
             Signature signature = Signature.getInstance("SHA256withECDSA", "BC");
@@ -147,8 +143,8 @@ public class tls_sigature {
      */
     @Deprecated
     public static CheckTLSSignatureResult CheckTLSSignature(String sig, String appid3rd, long sdkappid,
-            String identifier, long accountType,
-            String pubKeyContent) {
+                                                            String identifier, long accountType,
+                                                            String pubKeyContent) {
         CheckTLSSignatureResult result = new CheckTLSSignatureResult();
         Security.addProvider(new BouncyCastleProvider());
 
@@ -190,13 +186,12 @@ public class tls_sigature {
             }
 
             //Get Serial String from json
-            String SerialString =
-                "TLS.appid_at_3rd:" + appid3rd + "\n" +
-                "TLS.account_type:" + accountType + "\n" +
-                "TLS.identifier:" + identifier + "\n" +
-                "TLS.sdk_appid:" + sdkappid + "\n" +
-                "TLS.time:" + sigTime + "\n" +
-                "TLS.expire_after:" + sigExpire + "\n";
+            String SerialString = "TLS.appid_at_3rd:" + appid3rd + "\n"
+                    + "TLS.account_type:" + accountType + "\n"
+                    + "TLS.identifier:" + identifier + "\n"
+                    + "TLS.sdk_appid:" + sdkappid + "\n"
+                    + "TLS.time:" + sigTime + "\n"
+                    + "TLS.expire_after:" + sigExpire + "\n";
 
             Reader reader = new CharArrayReader(pubKeyContent.toCharArray());
             PEMParser  parser = new PEMParser(reader);
@@ -275,14 +270,14 @@ public class tls_sigature {
         byte[] signatureBytes = Base64.decode(sigTLS.getBytes(Charset.forName("UTF-8")));
 
         try {
-            String strSdkAppid = jsonObject.getString("TLS.sdk_appid");
+            String strSdkappid = jsonObject.getString("TLS.sdk_appid");
             String sigTime = jsonObject.getString("TLS.time");
             String sigExpire = jsonObject.getString("TLS.expire_after");
 
-            if (Integer.parseInt(strSdkAppid) != sdkappid)
+            if (Integer.parseInt(strSdkappid) != sdkappid)
             {
                 result.errMessage = new String(	"sdkappid "
-                        + strSdkAppid
+                        + strSdkappid
                         + " in tls sig not equal sdkappid "
                         + sdkappid
                         + " in request");
@@ -296,12 +291,12 @@ public class tls_sigature {
 
             //Get Serial String from json
             String SerialString =
-                "TLS.appid_at_3rd:" + 0 + "\n" +
-                "TLS.account_type:" + 0 + "\n" +
-                "TLS.identifier:" + identifier + "\n" +
-                "TLS.sdk_appid:" + sdkappid + "\n" +
-                "TLS.time:" + sigTime + "\n" +
-                "TLS.expire_after:" + sigExpire + "\n";
+                    "TLS.appid_at_3rd:" + 0 + "\n" +
+                            "TLS.account_type:" + 0 + "\n" +
+                            "TLS.identifier:" + identifier + "\n" +
+                            "TLS.sdk_appid:" + sdkappid + "\n" +
+                            "TLS.time:" + sigTime + "\n" +
+                            "TLS.expire_after:" + sigExpire + "\n";
 
             Reader reader = new CharArrayReader(publicKey.toCharArray());
             PEMParser  parser = new PEMParser(reader);
