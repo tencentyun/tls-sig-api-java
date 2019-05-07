@@ -54,23 +54,22 @@ public class tls_sigature {
 	/**
 	 * 生成 tls 票据
 	 * @param expire 有效期，单位是秒，推荐一个月
-	 * @param strAppid3rd 填写与 sdkAppid 一致字符串形式的值
-	 * @param skdAppid 应用的 appid
+	 * @param appid3rd 填写与 sdkAppid 一致字符串形式的值
+	 * @param sdkappid 应用的 appid
 	 * @param identifier 用户 id
 	 * @param accountType 创建应用后在配置页面上展示的 acctype
-	 * @param privStr 生成 tls 票据使用的私钥内容
+	 * @param priKeyContent 生成 tls 票据使用的私钥内容
 	 * @return 如果出错，GenTLSSignatureResult 中的 urlSig为空，errMsg 为出错信息，成功返回有效的票据
 	 */
 	@Deprecated
-	public static GenTLSSignatureResult GenTLSSignature(long expire, 
-			String strAppid3rd, long skdAppid, 
-			String identifier, long accountType, 
-			String privStr)
-	{
+	public static GenTLSSignatureResult GenTLSSignature(long expire,
+            String appid3rd, long sdkappid, String identifier,
+            long accountType, String priKeyContent) {
+
 		GenTLSSignatureResult result = new GenTLSSignatureResult();
-		
+
         Security.addProvider(new BouncyCastleProvider());
-        Reader reader = new CharArrayReader(privStr.toCharArray());
+        Reader reader = new CharArrayReader(priKeyContent.toCharArray());
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PEMParser parser = new PEMParser(reader);
 		PrivateKey privKeyStruct;
@@ -87,25 +86,21 @@ public class tls_sigature {
 		String jsonString = "{" 
 		+ "\"TLS.account_type\":\"" + accountType +"\","
 		+"\"TLS.identifier\":\"" + identifier +"\","
-		+"\"TLS.appid_at_3rd\":\"" + strAppid3rd +"\","
-	    +"\"TLS.sdk_appid\":\"" + skdAppid +"\","
+		+"\"TLS.appid_at_3rd\":\"" + appid3rd +"\","
+	    +"\"TLS.sdk_appid\":\"" + sdkappid +"\","
 		+"\"TLS.expire_after\":\"" + expire +"\""
 		+"}";
 		//System.out.println("#jsonString : \n" + jsonString);
 		
 		String time = String.valueOf(System.currentTimeMillis()/1000);
 		String SerialString = 
-			"TLS.appid_at_3rd:" + strAppid3rd + "\n" +
+			"TLS.appid_at_3rd:" + appid3rd + "\n" +
 			"TLS.account_type:" + accountType + "\n" +
 			"TLS.identifier:" + identifier + "\n" + 
-			"TLS.sdk_appid:" + skdAppid + "\n" + 
+			"TLS.sdk_appid:" + sdkappid + "\n" +
 			"TLS.time:" + time + "\n" +
 			"TLS.expire_after:" + expire +"\n";
-	
-		
-		//System.out.println("#SerialString : \n" + SerialString);
-		//System.out.println("#SerialString Hex: \n" + Hex.encodeHexString(SerialString.getBytes()));
-		
+
 		try{
 			//Create Signature by SerialString
 			Signature signature = Signature.getInstance("SHA256withECDSA", "BC");
@@ -114,15 +109,12 @@ public class tls_sigature {
 			byte[] signatureBytes = signature.sign();
 			
 			String sigTLS = Base64.toBase64String(signatureBytes);
-			//System.out.println("#sigTLS : " + sigTLS);
-			
+
 			//Add TlsSig to jsonString
 		    JSONObject jsonObject= new JSONObject(jsonString);
 		    jsonObject.put("TLS.sig", sigTLS);
 		    jsonObject.put("TLS.time", time);
 		    jsonString = jsonObject.toString();
-		    
-		   // System.out.println("#jsonString : \n" + jsonString);
 		    
 		    //compression
 		    Deflater compresser = new Deflater();
@@ -134,9 +126,7 @@ public class tls_sigature {
 		    compresser.end();
 
 		    result.urlSig = new String(base64_url.base64EncodeUrl(Arrays.copyOfRange(compressBytes,0,compressBytesLength)));
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 			result.errMessage = e.getMessage();
 		}
@@ -146,29 +136,24 @@ public class tls_sigature {
 
 	/**
 	 * 校验 tls 票据
-	 * @param urlSig 返回 tls 票据
-	 * @param strAppid3rd 填写与 sdkAppid 一致的字符串形式的值
-	 * @param skdAppid 应的 appid
+	 * @param sig 返回 tls 票据
+	 * @param appid3rd 填写与 sdkAppid 一致的字符串形式的值
+	 * @param sdkappid 应的 appid
 	 * @param identifier 用户 id
 	 * @param accountType 创建应用后在配置页面上展示的 acctype
-	 * @param publicKey 用于校验 tls 票据的公钥内容，但是需要先将公钥文件转换为 java 原生 api 使用的格式，下面是推荐的命令
+	 * @param  pubKeyContent 用于校验 tls 票据的公钥内容，但是需要先将公钥文件转换为 java 原生 api 使用的格式，下面是推荐的命令
 	 *         openssl pkcs8 -topk8 -in ec_key.pem -outform PEM -out p8_priv.pem -nocrypt
 	 * @return 如果出错 CheckTLSSignatureResult 中的 verifyResult 为 false，错误信息在 errMsg，校验成功为 true
 	 */
 	@Deprecated
-	public static CheckTLSSignatureResult CheckTLSSignature( String urlSig,
-			String strAppid3rd, long skdAppid, 
+	public static CheckTLSSignatureResult CheckTLSSignature(String sig, String appid3rd, long sdkappid,
 			String identifier, long accountType, 
-			String publicKey )
-	{
+			String pubKeyContent) {
 		CheckTLSSignatureResult result = new CheckTLSSignatureResult();	
         Security.addProvider(new BouncyCastleProvider());
 
-		//byte [] compressBytes = decoder.decode(urlSig.getBytes());
-		byte [] compressBytes = base64_url.base64DecodeUrl(urlSig.getBytes(Charset.forName("UTF-8")));
-		
-		//System.out.println("#compressBytes Passing in[" + compressBytes.length + "] " + Hex.encodeHexString(compressBytes));
-	
+		byte [] compressBytes = base64_url.base64DecodeUrl(sig.getBytes(Charset.forName("UTF-8")));
+
 		//Decompression
 		Inflater decompression =  new Inflater();
 		decompression.setInput(compressBytes, 0, compressBytes.length);
@@ -183,9 +168,7 @@ public class tls_sigature {
 		decompression.end();
 		
 		String jsonString = new String(Arrays.copyOfRange(decompressBytes, 0, decompressLength));
-		
-		//System.out.println("#Json String passing in : \n" + jsonString);
-		
+
 		//Get TLS.Sig from json
 		JSONObject jsonObject= new JSONObject(jsonString);
 		String sigTLS = jsonObject.getString("TLS.sig");
@@ -199,8 +182,6 @@ public class tls_sigature {
 			String sigExpire = jsonObject.getString("TLS.expire_after");
 			
 			//checkTime
-			//System.out.println("#time check: "+ System.currentTimeMillis()/1000 + "-" 
-					//+ Long.parseLong(sigTime) + "-" + Long.parseLong(sigExpire));
 			if( System.currentTimeMillis()/1000 - Long.parseLong(sigTime) > Long.parseLong(sigExpire))
 			{
 				result.errMessage = new String("TLS sig is out of date ");
@@ -210,16 +191,14 @@ public class tls_sigature {
 			
 			//Get Serial String from json
 			String SerialString = 
-				"TLS.appid_at_3rd:" + strAppid3rd + "\n" +
+				"TLS.appid_at_3rd:" + appid3rd + "\n" +
 				"TLS.account_type:" + accountType + "\n" +
 				"TLS.identifier:" + identifier + "\n" + 
-				"TLS.sdk_appid:" + skdAppid + "\n" + 
+				"TLS.sdk_appid:" + sdkappid + "\n" +
 				"TLS.time:" + sigTime + "\n" + 
 				"TLS.expire_after:" + sigExpire + "\n";
 		
-			//System.out.println("#SerialString : \n" + SerialString);
-		
-	        Reader reader = new CharArrayReader(publicKey.toCharArray());
+	        Reader reader = new CharArrayReader(pubKeyContent.toCharArray());
 	        PEMParser  parser = new PEMParser(reader);
 	        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
 	        Object obj = parser.readObject();
@@ -230,13 +209,11 @@ public class tls_sigature {
 			signature.initVerify(pubKeyStruct);
 			signature.update(SerialString.getBytes(Charset.forName("UTF-8")));
 			result.verifyResult = signature.verify(signatureBytes);
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 			result.errMessage = "Failed in checking sig";
 		}
-		
+
 		return result;
 	}
 
@@ -244,47 +221,47 @@ public class tls_sigature {
 	 * 生成 tls 票据，精简参数列表，有效期默认为 180 天
 	 * @param skdAppid 应用的 sdkappid
 	 * @param identifier 用户 id
-	 * @param privStr 私钥文件内容
+	 * @param priKeyContent 私钥文件内容
 	 * @return GenTLSSignatureResult
 	 */
 	public static GenTLSSignatureResult GenTLSSignatureEx(
 			long skdAppid,
 			String identifier,
-			String privStr) {
-		return GenTLSSignatureEx(skdAppid, identifier, privStr, 3600*24*180);
+			String priKeyContent) {
+		return GenTLSSignatureEx(skdAppid, identifier, priKeyContent, 3600*24*180);
 	}
 
 	/**
 	 * 生成 tls 票据，精简参数列表
 	 * @param skdAppid 应用的 sdkappid
 	 * @param identifier 用户 id
-	 * @param privStr 私钥文件内容
+	 * @param priKeyContent 私钥文件内容
 	 * @param expire 有效期，以秒为单位，推荐时长一个月
 	 * @return GenTLSSignatureResult
 	 */
 	public static GenTLSSignatureResult GenTLSSignatureEx(
 			long skdAppid,
 			String identifier,
-			String privStr,
+			String priKeyContent,
 			long expire) {
-		return GenTLSSignature(expire, "0", skdAppid, identifier, 0, privStr);
+		return GenTLSSignature(expire, "0", skdAppid, identifier, 0, priKeyContent);
 	}
 	
 	public static CheckTLSSignatureResult CheckTLSSignatureEx(
-			String urlSig,
-			long sdkAppid, 
+			String sig,
+			long sdkappid,
 			String identifier, 
-			String publicKey ) throws DataFormatException {
+			String publicKey) throws DataFormatException {
 
 		CheckTLSSignatureResult result = new CheckTLSSignatureResult();	
         Security.addProvider(new BouncyCastleProvider());
 
-		byte [] compressBytes = base64_url.base64DecodeUrl(urlSig.getBytes(Charset.forName("UTF-8")));
+		byte [] compressBytes = base64_url.base64DecodeUrl(sig.getBytes(Charset.forName("UTF-8")));
 		
 		//Decompression
 		Inflater decompression =  new Inflater();
 		decompression.setInput(compressBytes, 0, compressBytes.length);
-		byte [] decompressBytes = new byte [1024];
+		byte[] decompressBytes = new byte[1024];
 		int decompressLength = decompression.inflate(decompressBytes);
 		decompression.end();
 		
@@ -302,12 +279,12 @@ public class tls_sigature {
 			String sigTime = jsonObject.getString("TLS.time");
 			String sigExpire = jsonObject.getString("TLS.expire_after");
 			
-			if (Integer.parseInt(strSdkAppid) != sdkAppid)
+			if (Integer.parseInt(strSdkAppid) != sdkappid)
 			{
 				result.errMessage = new String(	"sdkappid "
 						+ strSdkAppid
 						+ " in tls sig not equal sdkappid "
-						+ sdkAppid
+						+ sdkappid
 						+ " in request");
 				return result;
 			}
@@ -322,7 +299,7 @@ public class tls_sigature {
 				"TLS.appid_at_3rd:" + 0 + "\n" +
 				"TLS.account_type:" + 0 + "\n" +
 				"TLS.identifier:" + identifier + "\n" + 
-				"TLS.sdk_appid:" + sdkAppid + "\n" + 
+				"TLS.sdk_appid:" + sdkappid + "\n" +
 				"TLS.time:" + sigTime + "\n" + 
 				"TLS.expire_after:" + sigExpire + "\n";
 		
