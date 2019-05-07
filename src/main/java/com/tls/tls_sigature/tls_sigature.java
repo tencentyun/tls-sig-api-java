@@ -290,13 +290,12 @@ public class tls_sigature {
             }
 
             //Get Serial String from json
-            String SerialString =
-                    "TLS.appid_at_3rd:" + 0 + "\n" +
-                            "TLS.account_type:" + 0 + "\n" +
-                            "TLS.identifier:" + identifier + "\n" +
-                            "TLS.sdk_appid:" + sdkappid + "\n" +
-                            "TLS.time:" + sigTime + "\n" +
-                            "TLS.expire_after:" + sigExpire + "\n";
+            String SerialString = "TLS.appid_at_3rd:" + 0 + "\n"
+                    + "TLS.account_type:" + 0 + "\n"
+                    + "TLS.identifier:" + identifier + "\n"
+                    + "TLS.sdk_appid:" + sdkappid + "\n"
+                    + "TLS.time:" + sigTime + "\n"
+                    + "TLS.expire_after:" + sigExpire + "\n";
 
             Reader reader = new CharArrayReader(publicKey.toCharArray());
             PEMParser  parser = new PEMParser(reader);
