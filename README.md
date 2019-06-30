@@ -22,7 +22,7 @@ dependencies {
 ``` shell
 ./gradlew -b user_build.gradle build
 ```
-生成的 jar 在 `build/libs` 下面可以找到。依赖需要自行下载。
+生成的 jar 在 `build/libs` 下面可以找到。依赖需要自行到 [release](https://github.com/tencentyun/tls-sig-api-java/releases) 下载。
 
 
 ## 生成 sig
