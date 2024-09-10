@@ -6,15 +6,15 @@ repositories {
 }
 dependencies {
     // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on
-    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.59'
+    compile group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78.1'
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
-    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.59'
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1'
     // https://mvnrepository.com/artifact/org.json/json
-    compile group: 'org.json', name: 'json', version: '20180130'
+    compile group: 'org.json', name: 'json', version: '20240303'
     // https://mvnrepository.com/artifact/junit/junit
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'junit', name: 'junit', version: '4.13.1'
 }
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 version = '1.2'
 group = "com.github.tencentyun"
 archivesBaseName = "tls-sig-api"
